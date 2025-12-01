@@ -2,6 +2,7 @@ const JAFAD = {
     init() {
         this.setupMenuToggle();
         this.setupCarousel();
+        this.setupPortfolioCarousel();
         this.setupForm();
         this.lazyLoadImages();
     },
@@ -112,6 +113,57 @@ const JAFAD = {
                 images.forEach(img => imageObserver.observe(img));
             }
         }
+    },
+
+    setupPortfolioCarousel() {
+        const carouselTrack = document.querySelector('.carousel-track');
+        if (!carouselTrack) return;
+
+        const slides = Array.from(carouselTrack.querySelectorAll('.carousel-slide-item'));
+        if (!slides.length) return;
+
+        let currentIndex = 0;
+
+        const updateCarousel = (index) => {
+            const offset = -index * 100;
+            carouselTrack.style.transform = `translateX(${offset}%)`;
+
+            // Update dots
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach(dot => dot.classList.remove('active'));
+            if (dots[index]) dots[index].classList.add('active');
+        };
+
+        const nextSlide = () => {
+            currentIndex = (currentIndex + 1) % slides.length;
+            updateCarousel(currentIndex);
+        };
+
+        const prevSlide = () => {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateCarousel(currentIndex);
+        };
+
+        // Button controls
+        const nextBtn = document.querySelector('.carousel-btn-next');
+        const prevBtn = document.querySelector('.carousel-btn-prev');
+
+        if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+        if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+
+        // Dot controls
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentIndex = index;
+                updateCarousel(currentIndex);
+            });
+        });
+
+        // Auto-advance carousel
+        setInterval(() => {
+            nextSlide();
+        }, 4000);
     }
 };
 
